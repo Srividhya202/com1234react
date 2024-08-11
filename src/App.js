@@ -9,22 +9,35 @@ import AgentDashboard from './pages/AgentDashboard';
 import ClientDashboard from './pages/ClientDashboard';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
   };
 
   return (
     <Router>
-      <Header isAuthenticated={isAuthenticated} />
+      <Header isAuthenticated={!!user} onLogout={handleLogout} />
       <Routes>
-        <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
+        <Route path="/" element={<Home isAuthenticated={!!user} />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/agent-dashboard" element={<AgentDashboard />} />
-        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route
+          path="/admin-dashboard"
+          element={user?.role === 'admin' ? <AdminDashboard /> : <Login onLogin={handleLogin} />}
+        />
+        <Route
+          path="/agent-dashboard"
+          element={user?.role === 'agent' ? <AgentDashboard /> : <Login onLogin={handleLogin} />}
+        />
+        <Route
+          path="/client-dashboard"
+          element={user?.role === 'client' ? <ClientDashboard /> : <Login onLogin={handleLogin} />}
+        />
       </Routes>
     </Router>
   );
